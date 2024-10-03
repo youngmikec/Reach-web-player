@@ -1,0 +1,55 @@
+
+
+.listContainer {
+    padding: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4;
+    margin: 1rem 0;
+}
+
+.textCaption {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+    color: #6601FF;
+}
+
+.trackContainer {
+    padding: .5rem;
+    display: flex;
+    justify-content: start;
+    gap: 10px;
+}
+
+.trackName{
+    font-size: 11px;
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.trackArtist{
+    font-size: 8px;
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.trackText{
+    font-size: 8px;
+    margin: 5px 0;
+    font-weight: 400;
+}
+
+.trackImage {
+    border-radius: 5px;
+    width: 40px;
+    height: 40px;
+
+}
+
+.trackDetails {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    gap: 4px;
+}

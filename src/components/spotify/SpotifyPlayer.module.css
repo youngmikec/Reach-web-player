@@ -1,0 +1,25 @@
+.playerContainer {
+    margin: 0 auto;
+    width: 50%;
+    padding: 0.65rem 1rem;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.245), rgba(0, 0, 0, 0.927));
+}
+
+.mainContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4
+}
+
+@media screen and (max-width: 414px) {
+    .playerContainer {
+        margin: 0 auto;
+        width: 90%;
+        padding: 0.65rem 1rem;
+        display: flex;
+        justify-content: center;
+    }
+}
