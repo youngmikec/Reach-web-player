@@ -4,6 +4,8 @@ import axios from 'axios';
 import styles from './SpotifyPlayer.module.css';
 import TrackPlayer from './TrackPlayer/player';
 import { ITrack } from '../../Interface';
+import { useDispatch } from 'react-redux';
+import { SET_CURRENT_TRACK_STATE, SET_IS_PLAYING_STATE } from '../../store/track-store';
 // import TrackLists from './TrackLists/tracklist';
 
 type Props = {
@@ -12,7 +14,7 @@ type Props = {
 }
 
 const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
-//   const { data: session } = useSession();
+  const dispatch = useDispatch();
   const [track, setTrack] = useState<any>(null);
   const [recommendedTracks, setRecommendedTracks] = useState<ITrack[]>([]);
   // const [ userProfile, setUserProfile] = useState<any>(null);
@@ -38,7 +40,12 @@ const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setTrack(response.data);
+      if(response.data){
+        setTrack(response.data);
+        dispatch(SET_CURRENT_TRACK_STATE(response.data));
+        dispatch(SET_IS_PLAYING_STATE(response?.data?.is_playing));
+      }
+
     } catch (error) {
       console.error('Error fetching current track:', error);
     }
@@ -128,7 +135,8 @@ const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
     }
     {
       (token) && 
-      <div className={styles.playerContainer}>
+      // className={styles.playerContainer}
+      <div className="w-full h-full">
         {
           track && (
             <TrackPlayer 

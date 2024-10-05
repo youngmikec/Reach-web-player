@@ -18,9 +18,9 @@ export const formatDuration = (ms: number): string => {
     
     // Format the result based on the duration
     if (hours > 0) {
-      return `${hours}h:${minutes}m:${seconds}s`;
+      return `${hours}:${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     } else {
-      return `${minutes}m:${seconds}s`;
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
   }
    
