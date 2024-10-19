@@ -4,6 +4,7 @@ type TrackState = {
     value: {
         track: any;
         isPlaying: boolean;
+        trackList: string[]
     }
 }
 
@@ -11,6 +12,7 @@ const initialState: TrackState = {
     value: {
         track: null,
         isPlaying: false,
+        trackList: []
     }
 }
 
@@ -23,10 +25,13 @@ export const trackSlice = createSlice({
         },
         SET_CURRENT_TRACK_STATE: (state, action: PayloadAction<any>) => {
             state.value.track = action.payload;
+        },
+        SET_TRACK_LIST: (state, action: PayloadAction<string[]>) => {
+            state.value.trackList = action.payload
         }
     }
 });
 
-export const { SET_CURRENT_TRACK_STATE, SET_IS_PLAYING_STATE } = trackSlice.actions;
+export const { SET_CURRENT_TRACK_STATE, SET_IS_PLAYING_STATE, SET_TRACK_LIST } = trackSlice.actions;
 
 export default trackSlice.reducer;

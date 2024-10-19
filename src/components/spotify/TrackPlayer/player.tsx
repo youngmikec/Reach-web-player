@@ -3,26 +3,51 @@ import axios from 'axios';
 import { useDispatch } from "react-redux";
 
 
-import styles from './player.module.css';
 import overLayPlayButton from '../../../assets/svgs/overlay-play.svg';
-import prevButton from '../../../assets/svgs/prev.svg';
-import nextButton from '../../../assets/svgs/next.svg';
 import { ITrack } from "../../../Interface";
 import PlayPauseButton from "../../ControlButtons/PlayPauseButton";
-import { SET_CURRENT_TRACK_STATE, SET_IS_PLAYING_STATE } from "../../../store/track-store";
-import { formatDuration } from "../../../helpers";
+import { SET_CURRENT_TRACK_STATE, SET_IS_PLAYING_STATE, SET_TRACK_LIST } from "../../../store/track-store";
+import { TrackDecider } from "../../../helpers";
+import PrevButton from "../../ControlButtons/PrevButton";
+import NextButton from "../../ControlButtons/NextButton";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import SeekBar from "../SeekBar";
 
 type Props = {
-    track: ITrack | any;
+    // track: ITrack | any;
     token: string;
     fullScreen?: boolean;
     recommendedTracks?: ITrack[]
 }
 
-const TrackPlayer: FC<Props> = ({ track, token }) => {
+const TrackPlayer: FC<Props> = ({ token }) => {
+    const navigate = useNavigate();
+    const track = useSelector((state: RootState) => state.trackState.value.track);
     const dispatch = useDispatch();
-    const [currentTrack, setCurrentTrack] = useState<any>(null)
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [searchParams] = useSearchParams();
+    const track_Id = searchParams.get('track_id');
+    
+
+    const [nextTrackId, setNextTrackId] = useState<string>('');
+    const [prevTrackId, setPrevTrackId] = useState<string>('');
+    const [tracks, setTracks] = useState<string[]>([]);
+
+    const trackss: string[] = [
+        "4jGvv0UNnfvoOQeuZKNI2T", 
+        "6F5c58TMEs1byxUstkzVeM",
+        "5xGeFN1C6m8XvP0RATLjJ1",
+        "4MRT0dDbhqFKl67WzhUbSw",
+        "699hD2eiW2hyKWkN8KssnD", 
+        "1uDjaezEbalGyGnuH80zDK", 
+        "3ovzlSJZVe1g4as77ajDQz", 
+        "1XqTT98Z08a2eOPCxyNr0H",
+        "4c2W3VKsOFoIg2SFaO6DY5", 
+        "2glGP8kEfACgJdZ86kWxhN", 
+        "0ADG9OgdVTL7fgREP75BrZ", 
+    ];
+
 
     const fetchCurrentTrack = async () => {
         try {
@@ -33,8 +58,6 @@ const TrackPlayer: FC<Props> = ({ track, token }) => {
           });
           console.log('response', response.data);
             if(response.data){
-                setCurrentTrack(response?.data);
-                setIsPlaying(response?.data?.is_playing);
                 dispatch(SET_CURRENT_TRACK_STATE(response.data));
                 dispatch(SET_IS_PLAYING_STATE(response?.data?.is_playing));
             }
@@ -58,31 +81,23 @@ const TrackPlayer: FC<Props> = ({ track, token }) => {
           console.error('Error playing/pausing track:', error);
         }
     };
-
-    // const playPauseTrack = async (trackUri: string | null = null, action: 'pause' | 'play' = 'play') => {
-
-    //     let data = {}
-    //     if(trackUri){
-    //       data = {
-    //         uris: [`spotify:track:${trackUri}`]
-    //       }
-    //     }
-    
-    //     try {
-    //       await axios.put(`https://api.spotify.com/v1/me/player/${action}`, data, {
-    //         headers: {
-    //           Authorization: `Bearer ${token}`,
-    //         },
-    //       });
-    //       fetchCurrentTrack();
-    //     } catch (error) {
-    //       console.error('Error playing/pausing track:', error);
-    //     }
-    // };
     
     
     useEffect(() => {
-    }, [track, token]);
+        const trackid = searchParams.get('track_id');
+        const track_list: any = searchParams.get('track_list')
+        const parsedTrackList = JSON.parse(track_list);
+        
+        if(parsedTrackList){
+            setTracks(parsedTrackList);
+            dispatch(SET_TRACK_LIST(parsedTrackList));
+        }
+        if(trackid && parsedTrackList.length > 0){
+            const { nextTrackId, prevTrackId } = TrackDecider(trackid, parsedTrackList);
+            setNextTrackId(nextTrackId);
+            setPrevTrackId(prevTrackId);
+        }
+    }, [track_Id, searchParams.get('track_list'), token]);
 
     return (
 
@@ -136,32 +151,16 @@ const TrackPlayer: FC<Props> = ({ track, token }) => {
                     </div>
                 </div>
 
-                <div className={styles.seekContainer}>
-                    <div className={styles.seekBarContainer}>
-                        {/* <!-- Seek bar --> */}
-                        <input type="range" id="seek-bar" className={styles.seekBar} min="0" max="100" value="0" />
+                
 
-                        {/* <!-- Time display below the seek bar --> */}
-                        <div className={styles.timeDisplay}>
-                            <span id="current-time">
-                                {formatDuration(track?.progress_ms || 0)}
-                            </span>
-                            <span id="total-duration">
-                                {formatDuration(track?.item?.duration_ms || 0)}
-                            </span>
-                        </div>
-                    </div>
+                <div className="my-4">
+                    <SeekBar token={token} />
                 </div>
                 
                 <div className="flex justify-center gap-12 my-4">
                     <div className="flex justify-center items-center">
-                        <img
-                            onClick={playPauseTrack}
-                            src={prevButton}
-                            width={"40"}
-                            height={"40"}
-                            alt="over play button"
-                            className="object-contain" // Can be 'contain', 'cover', 'fill', etc.
+                        <PrevButton
+                            trackId={prevTrackId}
                         />
                     </div>
                     <div className="flex justify-center items-center">
@@ -171,13 +170,8 @@ const TrackPlayer: FC<Props> = ({ track, token }) => {
                         />
                     </div>
                     <div className="flex justify-center items-center">
-                        <img
-                            onClick={playPauseTrack}
-                            src={nextButton}
-                            width={"40"}
-                            height={"40"}
-                            alt="over play button"
-                            className="object-contain" // Can be 'contain', 'cover', 'fill', etc.
+                        <NextButton
+                            trackId={nextTrackId}
                         />
                     </div>
                 </div>

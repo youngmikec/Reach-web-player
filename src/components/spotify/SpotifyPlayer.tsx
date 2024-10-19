@@ -94,6 +94,24 @@ const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
     }
   };
 
+  async function getCurrentPlaybackState() {
+    try{
+      const response = await axios.get('https://api.spotify.com/v1/me/player', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response) {
+        const data = response.data;
+        console.log('Current playback state:', data);
+      }
+    }catch(err) {
+      console.error('Error fetching playback state:', err);
+    }
+}
+
   const handleSignIn = async () => {
     try {
       const response = await fetch('https://your-api.com/auth/login', {
@@ -123,6 +141,7 @@ const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
   useEffect(() => {
     playPauseTrack(trackId, 'play');
     fetchUserRecommendedTracks();
+    getCurrentPlaybackState();
   }, [token, trackId]);
 
 
@@ -140,7 +159,7 @@ const SpotifyPlayer: FC<Props> = ({ token, trackId }) => {
         {
           track && (
             <TrackPlayer 
-              track={track} 
+              // track={track} 
               token={token}
               fullScreen={trackId ? true : false}
               recommendedTracks={recommendedTracks}

@@ -1,5 +1,7 @@
 // import { User } from "../common";
 
+import { TrackReturnProps } from "../Interface";
+
 export const getItem = (key: string) => {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
@@ -59,3 +61,53 @@ export const formatCurrency = (amount: number | undefined, currency: string | un
     }
     return '';
 };
+
+export const TrackDecider = (currentTrackId: string = '', tracks: string[]): TrackReturnProps => {
+    let trackId: string = (currentTrackId && tracks.length > 0) ? currentTrackId : tracks[0];
+
+    let returnProps: TrackReturnProps = {
+        currentTrackId: '',
+        nextTrackId: '',
+        prevTrackId: ''
+    };
+
+    if(tracks.length > 0){
+        let trackIndex: number = tracks.findIndex(track => track === trackId);
+        let prevIndex: number = 0;
+        let nextIndex: number = 0;
+        if(trackIndex < 0){
+            trackIndex = 0;
+            nextIndex = trackIndex + 1;
+            prevIndex = tracks.length - 1;
+        }
+        if(trackIndex === 0){
+            nextIndex = trackIndex + 1;
+            prevIndex = tracks.length - 1;
+        }
+        if(trackIndex > 0 && trackIndex < (tracks.length - 1)){
+            nextIndex = trackIndex + 1;
+            prevIndex = trackIndex - 1;
+        }
+        if(trackIndex === (tracks.length - 1)){
+            nextIndex = 0;
+            prevIndex = trackIndex - 1;
+        }
+
+        returnProps.currentTrackId = tracks[trackIndex];
+        returnProps.nextTrackId = tracks[nextIndex];
+        returnProps.prevTrackId = tracks[prevIndex];
+    }
+
+    return returnProps;
+}
+
+export const encodeArrayToBase64 = (arr: string[]): string => {
+    const jsonString = JSON.stringify(arr);  // Convert array to JSON string
+    return btoa(jsonString);                 // Encode JSON string to Base64
+}
+
+export const decodeBase64ToArray = (base64String: string): string[] => {
+    const jsonString = atob(base64String);  // Decode Base64 to JSON string
+    return JSON.parse(jsonString);          // Parse JSON string back to array
+}
+

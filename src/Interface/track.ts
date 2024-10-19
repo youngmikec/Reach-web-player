@@ -61,3 +61,9 @@ export interface ExternalIds {
     isrc: string;
 }
   
+
+export type TrackReturnProps = {
+    currentTrackId: string;
+    nextTrackId: string;
+    prevTrackId: string;
+}
